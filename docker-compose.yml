@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  worker-dev:
+    container_name: worker.dev
+    image: python:3
+    working_dir: /usr/src/app
+    volumes:
+      - '.:/usr/src/app'
+      - '../pyclientlib/:/usr/src/libs/pyclientlib'
+    environment: 
+      - CONTIFLOW_WORKDIR=/tmp/contiflow
+      - CONTIFLOW_HOST=https://monster:5001
+      - CONTIFLOW_PROJECT=
+      - CONTIFLOW_JOB=
+      - CONTIFLOW_STEP=
+    command: python run.py
