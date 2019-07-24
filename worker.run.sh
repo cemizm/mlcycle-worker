@@ -1,1 +1,1 @@
-docker-compose up worker-dev
+docker-compose up -d worker

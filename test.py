@@ -1,7 +1,7 @@
 
-import contiflow
+import mlcycle
 
-client = contiflow.init()
+client = mlcycle.from_env()
 
 job = "4c16579d-c297-4554-aa08-78422a0502eb"
 step = 2

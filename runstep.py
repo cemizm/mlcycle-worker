@@ -1,4 +1,4 @@
-import contiflow
+import mlcycle
 import os
 
 import yaml
@@ -6,61 +6,52 @@ import git
 import docker
 import datetime
 
-cclient = contiflow.from_env()
-dclient = docker.from_env()
-
 print("------------------------------------------------------------------------------------")
 print("------------------------------ Step execution started ------------------------------")
 print("------------------------------------------------------------------------------------")
 
 print()
-print("------------------------------- Initialize Environment------------------------------")
-workdir = None
-jobId = None
-stepnr = None
-runtime = None
-volname = None
+print("------------------------------ Initialize Environment ------------------------------")
 
-if 'CONTIFLOW_WORKDIR' in os.environ:
-    workdir = os.environ['CONTIFLOW_WORKDIR']
-
-if 'CONTIFLOW_VOLUME' in os.environ:
-    volname = os.environ['CONTIFLOW_VOLUME']
-
-if 'CONTIFLOW_RUNTIME' in os.environ:
-    runtime = os.environ['CONTIFLOW_RUNTIME']
-
-if 'CONTIFLOW_JOB' in os.environ:
-    jobId = os.environ['CONTIFLOW_JOB']
-
-if 'CONTIFLOW_STEP' in os.environ:
-    stepnr = os.environ['CONTIFLOW_STEP']
+workdir = os.environ.get('MLCYCLE_WORKDIR')
+volname = os.environ.get('MLCYCLE_VOLUME')
+runtime = os.environ.get('MLCYCLE_RUNTIME')
+host = os.environ.get('MLCYCLE_HOST')
+jobId = os.environ.get('MLCYCLE_JOB')
+stepnr = os.environ.get('MLCYCLE_STEP')
 
 if not workdir:
-    raise ValueError("Configuration Error: CONTIFLOW_WORKDIR is not set")
+    raise ValueError("Configuration Error: MLCYCLE_WORKDIR is not set")
 
 if not volname:
-    raise ValueError("Configuration Error: CONTIFLOW_VOLUME is not set")
+    raise ValueError("Configuration Error: MLCYCLE_VOLUME is not set")
+
+if not host:
+    raise ValueError("Configuration Error: MLCYCLE_HOST is not set")
 
 if not jobId:
-    raise ValueError("CONTIFLOW_JOB is not set")
+    raise ValueError("MLCYCLE_JOB is not set")
 
 if not stepnr or not stepnr.isdigit():
-    raise TypeError("CONTIFLOW_STEP is either not set or is not an integer")
+    raise TypeError("MLCYCLE_STEP is either not set or is not an integer")
 
 stepnr = int(stepnr)
 
 print("Working dir:\t{}".format(workdir))
 print("Volume:\t\t{}".format(volname))
 print("Runtime:\t{}".format(runtime))
+print("Host:\t\t{}".format(host))
 print("Job Id:\t\t{}".format(jobId))
 print("Step Nr:\t{}".format(stepnr))
+
+cclient = mlcycle.init_with(host)
+dclient = docker.from_env()
 
 print()
 print("------------------------------- Load job information -------------------------------")
 job = cclient.Jobs.getById(jobId)
 if not job:
-    raise ValueError("CONTIFLOW_JOB is not in environment variables")
+    raise ValueError("MLCYCLE_JOB is not in environment variables")
 
 step = next((s for s in job['steps'] if s['number'] == stepnr), None)
 if not step:
@@ -123,17 +114,19 @@ else:
     volume_base = "/app"
     volume_workdir = os.path.join(volume_base, jobId, "repo")
 
-    volumes = { volname: { 'bind': volume_base, 'mode': 'rw' }}
+    volumes = { 
+        volname: { 'bind': volume_base, 'mode': 'rw' }
+    }
 
     command = None
     if 'command' in cfg_docker:
         command = cfg_docker['command']
 
     environment = {
-        "CONTIFLOW_HOST": os.environ['CONTIFLOW_HOST'],
-        "CONTIFLOW_PROJECT": os.environ['CONTIFLOW_PROJECT'],
-        "CONTIFLOW_JOB": os.environ['CONTIFLOW_JOB'],
-        "CONTIFLOW_STEP": os.environ['CONTIFLOW_STEP']
+        "MLCYCLE_HOST": os.environ['MLCYCLE_HOST'],
+        "MLCYCLE_PROJECT": os.environ['MLCYCLE_PROJECT'],
+        "MLCYCLE_JOB": os.environ['MLCYCLE_JOB'],
+        "MLCYCLE_STEP": os.environ['MLCYCLE_STEP']
     }
 
     image = None

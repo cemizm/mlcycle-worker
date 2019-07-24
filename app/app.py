@@ -1,19 +1,36 @@
 import time
-import contiflow
+import mlcycle
 
 import subprocess, os, shutil
 
 from .taskitem import TaskItem, TaskState
 
-if 'CONTIFLOW_WORKDIR' not in os.environ:
-    raise BaseException("contiflow workingdir not set")
+# Initialize and check environment variable
 
-workdir = os.environ['CONTIFLOW_WORKDIR']
-if not os.path.exists(workdir):
-    os.makedirs(workdir)
+workdir = os.environ.get('MLCYCLE_WORKDIR')
+volname = os.environ.get('MLCYCLE_VOLUME')
+runtime = os.environ.get('MLCYCLE_RUNTIME')
+host = os.environ.get('MLCYCLE_HOST')
 
-client = contiflow.from_env()
+if not workdir:
+    raise ValueError("Configuration Error: MLCYCLE_WORKDIR is not set")
 
+if not volname:
+    raise ValueError("Configuration Error: MLCYCLE_VOLUME is not set")
+
+if not host:
+    raise ValueError("Configuration Error: MLCYCLE_HOST is not set")
+
+print("------------------------------- Initialize Environment ------------------------------")
+print("Working dir:\t{}".format(workdir))
+print("Volume:\t\t{}".format(volname))
+print("Runtime:\t{}".format(runtime))
+print("Host:\t\t{}".format(host))
+
+print()
+print("------------------------------------ Start worker -----------------------------------")
+
+client = mlcycle.init_with(host)
 jobs = list()
 
 def run():
@@ -37,7 +54,7 @@ def run():
             elif job.state == TaskState.Remove:
                 removeJob(job)
 
-
+        print("waiting for new jobs...")
         resp = client.Scheduler.getPending()
         if not resp:
             time.sleep(5)
@@ -69,10 +86,10 @@ def claimStep(job):
 
 def runStep(job):
     env = os.environ.copy()
-    env['CONTIFLOW_PROJECT'] = str(job.getProjectId())
-    env['CONTIFLOW_JOB'] = str(job.getJobId())
-    env['CONTIFLOW_STEP'] = str(job.getStepNumber())
-    env['CONTIFLOW_WORKDIR'] = job.working_dir
+    env['MLCYCLE_PROJECT'] = str(job.getProjectId())
+    env['MLCYCLE_JOB'] = str(job.getJobId())
+    env['MLCYCLE_STEP'] = str(job.getStepNumber())
+    env['MLCYCLE_WORKDIR'] = job.working_dir
     
     job.logfile = os.path.join(job.working_dir, "console.log")
 

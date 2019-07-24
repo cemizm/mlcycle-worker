@@ -1,24 +1,25 @@
 version: '3'
 
 services:
-  worker-dev:
-    container_name: worker.dev
+  worker:
+    container_name: worker
     image: python:3
     working_dir: /usr/src/app
     volumes:
       - '../git-config:/root/.ssh'
-      - 'workdir:/tmp/contiflow'
+      - 'workdir:/tmp/mlcycle'
       - '/var/run/docker.sock:/var/run/docker.sock:ro'
       - '.:/usr/src/app'
-      - '../pyclientlib/:/usr/src/libs/pyclientlib'
     environment:
-      - CONTIFLOW_RUNTIME=
-      - CONTIFLOW_VOLUME=worker_workdir
-      - CONTIFLOW_WORKDIR=/tmp/contiflow
-      - CONTIFLOW_HOST=https://monster:5001
-      - CONTIFLOW_PROJECT=
-      - CONTIFLOW_JOB=
-      - CONTIFLOW_STEP=
-    command: python run.py
+      - PYTHONUNBUFFERED=1
+      - MLCYCLE_VOLUME=worker_workdir
+      - MLCYCLE_WORKDIR=/tmp/mlcycle
+      - MLCYCLE_RUNTIME=
+      - MLCYCLE_HOST=https://cems-mbp.dhcp.fh-bielefeld.de:5001/api
+      - MLCYCLE_PROJECT=
+      - MLCYCLE_JOB=
+      - MLCYCLE_STEP=
+    restart: always
+    command: /bin/bash -c "pip install -r requirements.txt && python run.py"
 volumes:
   workdir:
