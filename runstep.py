@@ -58,6 +58,7 @@ date = datetime.datetime.fromtimestamp(head.committed_date)
 print('Head:\t\t{}'.format(head.hexsha))
 print('Date:\t\t{}'.format(date))
 print('Author:\t\t{}'.format(head.committer.name))
+print('Commit:\t\t{}'.format(head.message))
 
 if step['number'] == 0:
     print()
