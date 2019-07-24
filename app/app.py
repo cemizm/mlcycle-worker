@@ -12,7 +12,7 @@ workdir = os.environ['CONTIFLOW_WORKDIR']
 if not os.path.exists(workdir):
     os.makedirs(workdir)
 
-client = contiflow.init()
+client = contiflow.from_env()
 
 jobs = list()
 
@@ -95,7 +95,7 @@ def uploadFile(job):
 
     fragment = {
         'name': 'Console Log',
-        'filename': 'console.log',
+        'filename':  str(job.getStepNumber()) + '_console.log',
         'type': 1
     }
 

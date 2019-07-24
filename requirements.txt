@@ -1,2 +1,5 @@
+#git+ssh://git@git01-ifm-min.ad.fh-bielefeld.de/pvserve2/contiflow/pyclientlib.git
+git+https://github.com/cemizm/pyclientlib.git
 GitPython==2.1.12
 PyYAML==5.1.1
+docker==4.0.2

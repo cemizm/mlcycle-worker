@@ -40,7 +40,6 @@ class TaskItem:
         if 'number' not in self.job['step']:
             return None
 
-
         return self.job['step']['number']
 
     def retriesInc(self):
