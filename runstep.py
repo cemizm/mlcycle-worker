@@ -15,18 +15,44 @@ print("-------------------------------------------------------------------------
 
 print()
 print("------------------------------- Initialize Environment------------------------------")
-workdir = os.environ['CONTIFLOW_WORKDIR']
+workdir = None
+jobId = None
+stepnr = None
+runtime = None
+volname = None
 
-jobId = os.environ['CONTIFLOW_JOB']
+if 'CONTIFLOW_WORKDIR' in os.environ:
+    workdir = os.environ['CONTIFLOW_WORKDIR']
 
-stepnr = os.environ['CONTIFLOW_STEP']
-if not stepnr.isdigit():
-    raise TypeError("CONTIFLOW_STEP is not an integer")
+if 'CONTIFLOW_VOLUME' in os.environ:
+    volname = os.environ['CONTIFLOW_VOLUME']
 
-volname = os.environ['CONTIFLOW_VOLUME']
+if 'CONTIFLOW_RUNTIME' in os.environ:
+    runtime = os.environ['CONTIFLOW_RUNTIME']
+
+if 'CONTIFLOW_JOB' in os.environ:
+    jobId = os.environ['CONTIFLOW_JOB']
+
+if 'CONTIFLOW_STEP' in os.environ:
+    stepnr = os.environ['CONTIFLOW_STEP']
+
+if not workdir:
+    raise ValueError("Configuration Error: CONTIFLOW_WORKDIR is not set")
+
+if not volname:
+    raise ValueError("Configuration Error: CONTIFLOW_VOLUME is not set")
+
+if not jobId:
+    raise ValueError("CONTIFLOW_JOB is not set")
+
+if not stepnr or not stepnr.isdigit():
+    raise TypeError("CONTIFLOW_STEP is either not set or is not an integer")
 
 stepnr = int(stepnr)
+
 print("Working dir:\t{}".format(workdir))
+print("Volume:\t\t{}".format(volname))
+print("Runtime:\t{}".format(runtime))
 print("Job Id:\t\t{}".format(jobId))
 print("Step Nr:\t{}".format(stepnr))
 
@@ -150,6 +176,7 @@ else:
 
     container = dclient.containers.run(image, 
                                        command=command,
+                                       runtime=runtime,
                                        detach=True,
                                        auto_remove=True, 
                                        environment=environment,
