@@ -16,6 +16,7 @@ print("------------------------------ Initialize Environment -------------------
 workdir = os.environ.get('MLCYCLE_WORKDIR')
 volname = os.environ.get('MLCYCLE_VOLUME')
 runtime = os.environ.get('MLCYCLE_RUNTIME')
+visible_gpus = os.environ.get('MLCYCLE_VISIBLE_GPUS')
 host = os.environ.get('MLCYCLE_HOST')
 jobId = os.environ.get('MLCYCLE_JOB')
 stepnr = os.environ.get('MLCYCLE_STEP')
@@ -40,6 +41,7 @@ stepnr = int(stepnr)
 print("Working dir:\t{}".format(workdir))
 print("Volume:\t\t{}".format(volname))
 print("Runtime:\t{}".format(runtime))
+print("Visible GPUS:\t{}".format(visible_gpus))
 print("Host:\t\t{}".format(host))
 print("Job Id:\t\t{}".format(jobId))
 print("Step Nr:\t{}".format(stepnr))
@@ -128,6 +130,9 @@ else:
         "MLCYCLE_JOB": os.environ['MLCYCLE_JOB'],
         "MLCYCLE_STEP": os.environ['MLCYCLE_STEP']
     }
+
+    if visible_gpus:
+        environment['NVIDIA_VISIBLE_DEVICES'] = visible_gpus
 
     image = None
     if 'image' in cfg_docker:

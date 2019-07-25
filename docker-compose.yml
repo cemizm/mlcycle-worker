@@ -14,11 +14,9 @@ services:
       - PYTHONUNBUFFERED=1
       - MLCYCLE_VOLUME=worker_workdir
       - MLCYCLE_WORKDIR=/tmp/mlcycle
-      - MLCYCLE_RUNTIME=
       - MLCYCLE_HOST=https://cems-mbp.dhcp.fh-bielefeld.de:5001/api
-      - MLCYCLE_PROJECT=
-      - MLCYCLE_JOB=
-      - MLCYCLE_STEP=
+      - MLCYCLE_RUNTIME=nvidia
+      - MLCYCLE_VISIBLE_GPUS=
     restart: always
     command: /bin/bash -c "pip install -r requirements.txt && python run.py"
 volumes:
