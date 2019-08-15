@@ -1,1 +1,0 @@
-docker-compose run -d --name worker.dev worker /bin/sleep infinity
