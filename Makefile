@@ -1,17 +1,22 @@
 .DEFAULT_GOAL := worker
 
-.PHONY: worker.dev
-worker.dev:
-	docker-compose run -d --name worker.dev worker /bin/sleep infinity
+image = cemizm/mlcycle_worker
+tag = 0.1
 
-.PHONY: worker.cli
-worker.cli:
-	docker exec -it worker.dev /bin/bash
+.PHONY: build
+build:
+	docker build -t $(image):$(tag) -f Dockerfile .
 
-.PHONY: worker
-worker:
-	docker-compose up -d worker
+.PHONY: cli
+cli: build
+	docker run -it --rm $(image):$(tag) /bin/bash
 
-.PHONY: teardown
-teardown:
-	docker-compose down
+.PHONY: dev
+dev: build
+	docker run -it --rm $(image):$(tag) /bin/sleep infinity
+
+.PHONY: publish
+publish: build
+	docker tag $(image):$(tag) $(image):latest
+	docker push $(image):$(tag)
+	docker push $(image):latest
