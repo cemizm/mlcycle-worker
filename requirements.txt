@@ -1,4 +1,4 @@
 mlcycle==0.1.5
 GitPython==2.1.12
-PyYAML==5.1.1
+PyYAML==5.4
 docker==4.0.2
